@@ -21,6 +21,7 @@ def print_movie(movie):
     ratings = movie.get("Ratings", [])
     
     print(f"Title: {title}")
+    print(f"Ratings: {ratings}")
 
 def create_movie():
     """
@@ -64,7 +65,8 @@ def print_all_movies():
         print_movie(movie)
 
 def update_rating():
-    
+    table = get_table()
+
     try:
         title = input("What is the movie title? ")
         rating = int(input("What is the rating (integer): "))
@@ -83,6 +85,7 @@ def delete_movie():
     Prompt user for a Movie Title.
     Delete that item from the database.
     """
+    table = get_table()
 
     table.delete_item(
     Key={
@@ -96,7 +99,8 @@ def query_movie():
     Prompt user for a Movie Title.
     Print out the average of all ratings in the movie's Ratings list.
     """
-  
+    table = get_table()
+
     response = table.get_item(
     Key={
         'Title': input("Enter movie title: ").strip()
@@ -105,9 +109,9 @@ def query_movie():
 
     movie = response.get('Item')
     average = 0
-    if response.get('Item') != None:
+    if movie:
         if movie and 'Ratings'in movie and movie['Ratings']:
-            ratings_list = movie.get['Ratings']
+            ratings_list = movie.get('Ratings')
             average = sum(ratings_list) / len(ratings_list)
             print(f"The average rating is {average}")
         else:
