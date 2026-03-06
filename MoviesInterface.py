@@ -9,18 +9,59 @@ import boto3
 dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 table = dynamodb.Table('Movies')
 
+def get_table():
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('Movies')
+    return table
+
+def print_movie(movie):
+    """Print a single movie's title and ratings."""
+    
+    title = movie.get("Title", "Unknown Title")
+    ratings = movie.get("Ratings", [])
+    
+    print(f"Title: {title}")
+
 def create_movie():
     """
     Prompt user for a Movie Title.
     Add the movie to the database with the title and an empty Ratings list.
     """
-    print("creating a movie")
+    table = get_table()
+    
+    title = input("Enter movie title: ").strip()
+    
+    if not title:
+        print("Movie title cannot be empty.")
+        return
+    
+    movie = {
+        "Title": title,
+        "Ratings": []
+    }
+    
+    table.put_item(Item=movie)
+    
+    print(f"Movie '{title}' added successfully!")
 
 def print_all_movies():
-    """
-    Display all movies in the database.
-    """
-    print("display all movies")
+
+    """Scan the entire Movies table and print each item."""
+    table = get_table()
+    
+    # scan() retrieves ALL items in the table.
+    # For large tables you'd use query() instead — but for our small
+    # dataset, scan() is fine.
+    response = table.scan()
+    items = response.get("Items", [])
+    
+    if not items:
+        print("No movies found. Make sure your DynamoDB table has data.")
+        return
+    
+    print(f"Found {len(items)} movie(s):\n")
+    for movie in items:
+        print_movie(movie)
 
 def update_rating():
     """
