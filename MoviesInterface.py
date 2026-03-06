@@ -1,7 +1,7 @@
-# name: YOUR NAME HERE
-# date:
+# name: Rex Spieker
+# date: 3/5/2026
 # description: Implementation of CRUD operations with DynamoDB — CS178 Lab 10
-# proposed score: 0 (out of 5) -- if I don't change this, I agree to get 0 points.
+# proposed score: 3 (out of 5) -- if I don't change this, I agree to get 0 points.
 
 import boto3
 
@@ -96,7 +96,24 @@ def query_movie():
     Prompt user for a Movie Title.
     Print out the average of all ratings in the movie's Ratings list.
     """
-    print("query movie")
+  
+    response = table.get_item(
+    Key={
+        'Title': input("Enter movie title: ").strip()
+    }
+    )
+
+    movie = response.get('Item')
+    average = 0
+    if response.get('Item') != None:
+        if movie and 'Ratings'in movie and movie['Ratings']:
+            ratings_list = movie.get['Ratings']
+            average = sum(ratings_list) / len(ratings_list)
+            print(f"The average rating is {average}")
+        else:
+            print("This movie has no ratings.")
+    else:
+        print("This movie does not exist.")
 
 def print_menu():
     print("----------------------------")
